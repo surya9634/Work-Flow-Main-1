@@ -12,6 +12,43 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
+// Import the local database functions
+const { users: localUsers, onboarding: localOnboarding, socialMediaAccounts, messageTracking } = require('./db');
+
+// Generate JWT token
+const generateToken = (userId) => {
+  return jwt.sign(
+    { userId },
+    process.env.JWT_SECRET || 'your-secret-key',
+    { expiresIn: '7d' }
+  );
+};
+
+// Verify token middleware
+const authMiddleware = (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      throw new Error();
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const user = localUsers.findById(decoded.userId);
+    
+    if (!user) {
+      throw new Error();
+    }
+
+    // Remove password from user object
+    const { password, ...userWithoutPassword } = user;
+    req.user = userWithoutPassword;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Please authenticate' });
+  }
+};
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
@@ -976,72 +1013,6 @@ app.post('/api/messenger/send-message', async (req, res) => {
   }
 });
 
-// WHATSAPP ENDPOINT
-app.post('/api/whatsapp/send-message', authMiddleware, async (req, res) => {
-  try {
-    const { phoneNumber, message } = req.body;
-    if (!phoneNumber || !message) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-    // TODO: Integrate with WhatsApp Business API here
-    // For now, just simulate success:
-    console.log(`Sending WhatsApp message to ${phoneNumber}: ${message}`);
-    
-    // Track the message
-    messageTracking.create({
-      userId: req.user.id,
-      platform: 'whatsapp',
-      type: 'outgoing',
-      conversationId: phoneNumber,
-      messageId: Date.now().toString(),
-      content: message
-    });
-    
-    res.json({ success: true, to: phoneNumber, message });
-  } catch (err) {
-    console.error('WhatsApp message error:', err);
-    res.status(500).json({ error: 'Failed to send WhatsApp message' });
-  }
-});
-
-// AUTHENTICATION ENDPOINTS
-// Import the local database functions
-const { users: localUsers, onboarding: localOnboarding } = require('./db');
-
-// Generate JWT token
-const generateToken = (userId) => {
-  return jwt.sign(
-    { userId },
-    process.env.JWT_SECRET || 'your-secret-key',
-    { expiresIn: '7d' }
-  );
-};
-
-// Verify token middleware
-const authMiddleware = (req, res, next) => {
-  try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      throw new Error();
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    const user = localUsers.findById(decoded.userId);
-    
-    if (!user) {
-      throw new Error();
-    }
-
-    // Remove password from user object
-    const { password, ...userWithoutPassword } = user;
-    req.user = userWithoutPassword;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Please authenticate' });
-  }
-};
-
 // Sign Up Route
 app.post('/api/auth/signup', async (req, res) => {
   try {
@@ -1124,20 +1095,6 @@ app.post('/api/auth/signin', async (req, res) => {
     });
   }
 });
-
-// Get current user route (protected)
-app.get('/api/auth/me', authMiddleware, (req, res) => {
-  res.json({
-    success: true,
-    user: {
-      id: req.user.id,
-      email: req.user.email,
-      role: req.user.role,
-      onboardingCompleted: req.user.onboardingCompleted
-    }
-  });
-});
-
 // ONBOARDING ENDPOINTS
 
 // Submit Onboarding Data
@@ -1259,10 +1216,6 @@ app.get('/api/onboarding/:userId', authMiddleware, (req, res) => {
     });
   }
 });
-
-// SOCIAL MEDIA ACCOUNT ENDPOINTS
-// Import the local database functions for social media accounts
-const { socialMediaAccounts, messageTracking } = require('./db');
 
 // Get connected social media accounts
 app.get('/api/social-media/accounts', authMiddleware, (req, res) => {
@@ -1404,8 +1357,6 @@ app.post('/api/social-media/instagram/message', authMiddleware, async (req, res)
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
-});
-
 });
 
 // Get real conversations for MessengerChat

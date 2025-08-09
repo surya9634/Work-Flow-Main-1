@@ -200,16 +200,6 @@ To push this project to GitHub, follow these steps:
    git push
    ```
 
-## Deployment
-
-### Render Deployment
-
-1. Create a `render.yaml` file in the root directory (this file already exists in the project)
-
-2. Push your code to a GitHub repository
-
-3. Connect your repository to Render and deploy
-
 ## Usage
 
 1. Visit the application at `http://localhost:5173` (frontend) or `http://localhost:5000` (backend)
@@ -217,6 +207,47 @@ To push this project to GitHub, follow these steps:
 3. Complete the onboarding process
 4. Connect your social media accounts
 5. Start automating your social media interactions
+
+## Deployment
+
+### Render Deployment
+
+This project has been fixed to work properly with Render deployment. The following changes were made:
+
+1. Fixed syntax errors in `workflow-backend/server.js`
+2. Added missing imports for database functions
+3. Added missing authentication middleware
+4. Ensured proper database initialization
+
+To deploy to Render:
+
+1. Push your code to a GitHub repository:
+   ```bash
+   git add .
+   git commit -m "Fix Render deployment issues"
+   git push origin main
+   ```
+
+2. Connect your repository to Render:
+   - Go to https://dashboard.render.com/
+   - Click "New" and select "Web Service"
+   - Connect your GitHub account and select your repository
+   - Set the following configuration:
+     - Name: Your choice
+     - Region: Your choice
+     - Branch: main
+     - Root Directory: Leave empty (root)
+     - Environment: Node
+     - Build Command: `npm install && npm run build`
+     - Start Command: `npm start`
+     - Auto Deploy: Yes
+
+3. Add environment variables in the Render dashboard:
+   - PORT: 10000 (Render's default port)
+   - NODE_ENV: production
+   - All other required environment variables as specified in the .env files
+
+4. Click "Create Web Service" and wait for deployment to complete.
 
 ## API Endpoints
 
