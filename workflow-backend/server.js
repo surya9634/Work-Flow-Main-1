@@ -169,12 +169,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Serve React frontend in production
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, '../work-flow/dist');
-  app.use(express.static(frontendPath));
+  console.log('Serving frontend from:', frontendPath);
   
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
+  // Check if frontend directory exists
+  if (fs.existsSync(frontendPath)) {
+    app.use(express.static(frontendPath));
+    
+    // Handle React routing, return all requests to React app
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+  } else {
+    console.log('Frontend build directory not found, serving backend only');
+    // Fallback to backend UI if frontend not built
+    app.get('/', (req, res) => {
+      res.send(`
+        <h1>Work Automation Platform</h1>
+        <p>Backend server is running, but frontend is not built.</p>
+        <p><a href="/dashboard">Go to Backend Dashboard</a></p>
+      `);
+    });
+  }
 } else {
   // In development, serve a simple message
   app.get('/', (req, res) => {

@@ -11,7 +11,7 @@ services:
     name: work-flow-main
     env: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && cd work-flow && npm install && npm run build && cd ..
     startCommand: npm start
     envVars:
       - key: NODE_ENV
