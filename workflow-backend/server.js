@@ -12,6 +12,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
+// Set NODE_ENV if not already set
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
+
 // Import the local database functions
 const { users: localUsers, onboarding: localOnboarding, socialMediaAccounts, messageTracking } = require('./db');
 
@@ -60,12 +65,12 @@ const config = {
   instagram: {
     appId: process.env.INSTAGRAM_APP_ID || '1477959410285896',
     appSecret: process.env.INSTAGRAM_APP_SECRET || 'fc7fbca3fbecd5bc6b06331bc4da17c9',
-    redirectUri: process.env.REDIRECT_URI || 'https://your-domain.com/auth/instagram/callback'
+    redirectUri: process.env.REDIRECT_URI || `http://localhost:${PORT || 5000}/auth/instagram/callback`
   },
   facebook: {
     appId: process.env.FACEBOOK_APP_ID || '1256408305896903',
     appSecret: process.env.FACEBOOK_APP_SECRET || 'fc7fbca3fbecd5bc6b06331bc4da17c9',
-    callbackUrl: process.env.FACEBOOK_CALLBACK || 'https://work-automation-platform.onrender.com/auth/facebook/callback'
+    callbackUrl: process.env.FACEBOOK_CALLBACK || `http://localhost:${PORT || 5000}/auth/facebook/callback`
   },
   whatsapp: {
     phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '657991800734493',
@@ -163,11 +168,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve React frontend in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../work-flow/dist')));
+  const frontendPath = path.join(__dirname, '../work-flow/dist');
+  app.use(express.static(frontendPath));
   
   // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../work-flow/dist/index.html'));
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+} else {
+  // In development, serve a simple message
+  app.get('/', (req, res) => {
+    res.send(`
+      <h1>Work Automation Platform</h1>
+      <p>Backend server is running. For frontend, run the React development server.</p>
+      <p><a href="/dashboard">Go to Backend Dashboard</a></p>
+    `);
   });
 }
 

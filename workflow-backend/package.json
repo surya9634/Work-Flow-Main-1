@@ -7,7 +7,7 @@
     "dev": "nodemon server.js",
     "build-frontend": "cd ../work-flow && npm run build",
     "start-combined": "npm run build-frontend && node server.js",
-    "start-production": "NODE_ENV=production node server.js",
+    "start-production": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -21,7 +21,7 @@
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
-    "express": "^5.1.0",
+    "express": "^4.18.2",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.4",

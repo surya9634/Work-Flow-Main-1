@@ -8,22 +8,13 @@
 
 services:
   - type: web
-    name: workflow-backend
+    name: work-flow-main
     env: node
     plan: free
-    buildCommand: npm install && npm run build-frontend
+    buildCommand: npm install && cd ../work-flow && npm install && npm run build
     startCommand: npm run start-production
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5000
-  - type: web
-    name: workflow-frontend
-    env: static
-    plan: free
-    buildCommand: cd ../work-flow && npm install && npm run build
-    staticPublishPath: ../work-flow/dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://work-flow-main.onrender.com
+        value: 10000

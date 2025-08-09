@@ -4,9 +4,9 @@
   "description": "WorkFlow - Social Media Automation Platform",
   "main": "workflow-backend/server.js",
   "scripts": {
-    "start": "cd workflow-backend && node server.js",
+    "start": "cd workflow-backend && npm run start-production",
     "dev": "concurrently \"cd workflow-backend && npm run dev\" \"cd work-flow && npm run dev\"",
-    "build-frontend": "cd work-flow && npm run build",
+    "build": "cd work-flow && npm run build",
     "install-all": "npm install && cd workflow-backend && npm install && cd ../work-flow && npm install",
     "postinstall": "cd workflow-backend && npm install && cd ../work-flow && npm install"
   },
