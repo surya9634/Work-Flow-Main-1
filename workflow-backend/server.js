@@ -166,40 +166,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve React frontend in production
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../work-flow/dist');
-  console.log('Serving frontend from:', frontendPath);
-  
-  // Check if frontend directory exists
-  if (fs.existsSync(frontendPath)) {
-    app.use(express.static(frontendPath));
-    
-    // Handle React routing, return all requests to React app
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(frontendPath, 'index.html'));
-    });
-  } else {
-    console.log('Frontend build directory not found, serving backend only');
-    // Fallback to backend UI if frontend not built
-    app.get('/', (req, res) => {
-      res.send(`
-        <h1>Work Automation Platform</h1>
-        <p>Backend server is running, but frontend is not built.</p>
-        <p><a href="/dashboard">Go to Backend Dashboard</a></p>
-      `);
-    });
-  }
-} else {
-  // In development, serve a simple message
-  app.get('/', (req, res) => {
-    res.send(`
-      <h1>Work Automation Platform</h1>
-      <p>Backend server is running. For frontend, run the React development server.</p>
-      <p><a href="/dashboard">Go to Backend Dashboard</a></p>
-    `);
-  });
-}
 
 // Session middleware
 app.use(session({
@@ -354,58 +320,6 @@ async function refreshInstagramToken(userId) {
 
 // Routes
 
-// Home page
-app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Work - Social Media Automation Platform</title>
-      <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; }
-        .container { max-width: 800px; margin: 0 auto; text-align: center; }
-        h1 { font-size: 3rem; margin-bottom: 20px; }
-        p { font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9; }
-        .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin: 40px 0; }
-        .platform-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); }
-        .platform-card h3 { margin-bottom: 15px; color: #fff; }
-        .btn { display: inline-block; padding: 12px 24px; background: rgba(255,255,255,0.9); color: #333; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 10px; transition: all 0.3s; }
-        .btn:hover { background: white; transform: translateY(-2px); }
-        .dashboard-btn { background: #ff6b6b; color: white; }
-        .dashboard-btn:hover { background: #ff5252; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>Work Automation</h1>
-        <p>Automate your social media interactions across Instagram, Facebook Messenger, and WhatsApp</p>
-        
-        <div class="platform-grid">
-          <div class="platform-card">
-            <h3>📸 Instagram</h3>
-            <p>Automate comments and DMs based on keywords</p>
-            <a href="/auth/instagram" class="btn">Connect Instagram</a>
-          </div>
-          
-          <div class="platform-card">
-            <h3>💬 Facebook Messenger</h3>
-            <p>Manage conversations and send automated messages</p>
-            <a href="/auth/facebook" class="btn">Connect Facebook</a>
-          </div>
-          
-          <div class="platform-card">
-            <h3>📱 WhatsApp Business</h3>
-            <p>AI-powered customer support automation</p>
-            <a href="/whatsapp-setup" class="btn">Setup WhatsApp</a>
-          </div>
-        </div>
-        
-        <a href="/dashboard" class="btn dashboard-btn">Go to Dashboard</a>
-      </div>
-    </body>
-    </html>
-  `);
-});
 
 // Dashboard
 app.get('/dashboard', (req, res) => {
@@ -1766,4 +1680,38 @@ server.listen(PORT, () => {
   console.log('   💬 Facebook Messenger - Chat management');
   console.log('   📱 WhatsApp - AI-powered responses');
   console.log('=====================================');
+// Serve React frontend in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '../work-flow/dist');
+  console.log('Serving frontend from:', frontendPath);
+  
+  // Check if frontend directory exists
+  if (fs.existsSync(frontendPath)) {
+    app.use(express.static(frontendPath));
+    
+    // Handle React routing, return all requests to React app
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+  } else {
+    console.log('Frontend build directory not found, serving backend only');
+    // Fallback to backend UI if frontend not built
+    app.get('/', (req, res) => {
+      res.send(`
+        <h1>Work Automation Platform</h1>
+        <p>Backend server is running, but frontend is not built.</p>
+        <p><a href="/dashboard">Go to Backend Dashboard</a></p>
+      `);
+    });
+  }
+} else {
+  // In development, serve a simple message
+  app.get('/', (req, res) => {
+    res.send(`
+      <h1>Work Automation Platform</h1>
+      <p>Backend server is running. For frontend, run the React development server.</p>
+      <p><a href="/dashboard">Go to Backend Dashboard</a></p>
+    `);
+  });
+}
 });
