@@ -1682,11 +1682,25 @@ server.listen(PORT, () => {
   console.log('=====================================');
 // Serve React frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../work-flow/dist');
-  console.log('Serving frontend from:', frontendPath);
+  // More robust path resolution for frontend build
+  const possiblePaths = [
+    path.join(__dirname, '../work-flow/dist'),  // Development structure
+    path.join(__dirname, '../../work-flow/dist'),  // Alternative structure
+    path.join(__dirname, '../dist'),  // Build output in backend directory
+    path.join(process.cwd(), 'work-flow/dist'),  // Relative to current working directory
+    path.join(process.cwd(), 'dist')  // Direct dist folder
+  ];
   
-  // Check if frontend directory exists
-  if (fs.existsSync(frontendPath)) {
+  let frontendPath = null;
+  for (const possiblePath of possiblePaths) {
+    if (fs.existsSync(possiblePath)) {
+      frontendPath = possiblePath;
+      break;
+    }
+  }
+  
+  if (frontendPath) {
+    console.log('Serving frontend from:', frontendPath);
     app.use(express.static(frontendPath));
     
     // Handle React routing, return all requests to React app
@@ -1695,6 +1709,7 @@ if (process.env.NODE_ENV === 'production') {
     });
   } else {
     console.log('Frontend build directory not found, serving backend only');
+    console.log('Checked paths:', possiblePaths);
     // Fallback to backend UI if frontend not built
     app.get('/', (req, res) => {
       res.send(`
