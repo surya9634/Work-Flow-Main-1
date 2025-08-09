@@ -204,38 +204,7 @@ To push this project to GitHub, follow these steps:
 
 ### Render Deployment
 
-1. Create a `render.yaml` file in the root directory with the following content:
-   ```yaml
-   # Render deployment configuration
-   # When deploying to Render, make sure to:
-   # 1. Replace "workflow-backend" with your actual service name
-   # 2. Update VITE_API_URL to match your backend service name
-   # 3. Configure your Facebook/Instagram app with the correct callback URLs:
-   #    - Facebook: https://work-flow-main.onrender.com/auth/facebook/callback
-   #    - Instagram: https://work-flow-main.onrender.com/auth/instagram/callback
-
-   services:
-     - type: web
-       name: workflow-backend
-       env: node
-       plan: free
-       buildCommand: npm install
-       startCommand: npm start
-       envVars:
-         - key: NODE_ENV
-           value: production
-         - key: PORT
-           value: 5000
-     - type: web
-       name: workflow-frontend
-       env: static
-       plan: free
-       buildCommand: cd ../work-flow && npm install && npm run build
-       staticPublishPath: ../work-flow/dist
-       envVars:
-         - key: VITE_API_URL
-           value: https://work-flow-main.onrender.com
-   ```
+1. Create a `render.yaml` file in the root directory (this file already exists in the project)
 
 2. Push your code to a GitHub repository
 

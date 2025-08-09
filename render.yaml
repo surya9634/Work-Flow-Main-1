@@ -1,43 +1,29 @@
+# Render deployment configuration
+# When deploying to Render, make sure to:
+# 1. Replace "workflow-backend" with your actual service name
+# 2. Update VITE_API_URL to match your backend service name
+# 3. Configure your Facebook/Instagram app with the correct callback URLs:
+#    - Facebook: https://work-flow-main.onrender.com/auth/facebook/callback
+#    - Instagram: https://work-flow-main.onrender.com/auth/instagram/callback
+
 services:
   - type: web
     name: workflow-backend
-    runtime: node
+    env: node
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: npm install && cd workflow-backend && npm install
+    startCommand: cd workflow-backend && npm start
     envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: MONGO_URI
-        sync: false
-      - key: JWT_SECRET
-        sync: false
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: FACEBOOK_APP_ID
-        sync: false
-      - key: FACEBOOK_APP_SECRET
-        sync: false
-      - key: INSTAGRAM_APP_ID
-        sync: false
-      - key: INSTAGRAM_APP_SECRET
-        sync: false
-      - key: WHATSAPP_PHONE_NUMBER_ID
-        sync: false
-      - key: WEBHOOK_VERIFY_TOKEN
-        sync: false
-      - key: SESSION_SECRET
-        sync: false
-
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
   - type: web
     name: workflow-frontend
-    runtime: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    env: static
+    plan: free
+    buildCommand: npm install && cd work-flow && npm install && npm run build
+    staticPublishPath: work-flow/dist
     envVars:
-      - key: NODE_VERSION
-        value: 18
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+      - key: VITE_API_URL
+        value: https://work-flow-main.onrender.com
