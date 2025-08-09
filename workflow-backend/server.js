@@ -161,6 +161,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve React frontend in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../work-flow/dist')));
+  
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../work-flow/dist/index.html'));
+  });
+}
+
 // Session middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || 'work_automation_secret',

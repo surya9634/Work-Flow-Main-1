@@ -7,6 +7,7 @@
     "dev": "nodemon server.js",
     "build-frontend": "cd ../work-flow && npm run build",
     "start-combined": "npm run build-frontend && node server.js",
+    "start-production": "NODE_ENV=production node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

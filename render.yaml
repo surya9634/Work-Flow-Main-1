@@ -11,8 +11,8 @@ services:
     name: workflow-backend
     env: node
     plan: free
-    buildCommand: npm install && cd workflow-backend && npm install
-    startCommand: cd workflow-backend && npm start
+    buildCommand: npm install && cd workflow-backend && npm install && cd work-flow && npm install && npm run build
+    startCommand: cd workflow-backend && npm run start-production
     envVars:
       - key: NODE_ENV
         value: production

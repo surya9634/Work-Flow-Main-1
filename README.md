@@ -218,6 +218,7 @@ This project has been fixed to work properly with Render deployment. The followi
 2. Added missing imports for database functions
 3. Added missing authentication middleware
 4. Ensured proper database initialization
+5. Configured backend to serve built React frontend in production
 
 To deploy to Render:
 
@@ -238,8 +239,8 @@ To deploy to Render:
      - Branch: main
      - Root Directory: Leave empty (root)
      - Environment: Node
-     - Build Command: `npm install && npm run build`
-     - Start Command: `npm start`
+     - Build Command: `npm install && cd work-flow && npm install && npm run build`
+     - Start Command: `cd workflow-backend && npm run start-production`
      - Auto Deploy: Yes
 
 3. Add environment variables in the Render dashboard:
@@ -248,6 +249,48 @@ To deploy to Render:
    - All other required environment variables as specified in the .env files
 
 4. Click "Create Web Service" and wait for deployment to complete.
+
+## Local Development
+
+To run the application locally with both frontend and backend:
+
+1. Install dependencies for both frontend and backend:
+   ```bash
+   npm install
+   cd work-flow && npm install
+   cd ../workflow-backend && npm install
+   ```
+
+2. Start the development servers:
+   ```bash
+   # In one terminal, start the backend
+   cd workflow-backend
+   npm run dev
+   
+   # In another terminal, start the frontend
+   cd work-flow
+   npm run dev
+   ```
+
+3. Visit `http://localhost:5173` for the frontend and `http://localhost:5000` for the backend
+
+## Production Build
+
+To build and run the production version locally:
+
+1. Build the frontend:
+   ```bash
+   cd work-flow
+   npm run build
+   ```
+
+2. Start the backend with production settings:
+   ```bash
+   cd ../workflow-backend
+   npm run start-production
+   ```
+
+3. Visit `http://localhost:5000` to see the full application
 
 ## API Endpoints
 
